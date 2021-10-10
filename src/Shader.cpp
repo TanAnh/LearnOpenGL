@@ -133,6 +133,12 @@ void Shader::setFloat(const std::string& name, float value)
     glUniform1f(GetUniformLocation(name), value);
 }
 
+void Shader::setVec3f(const std::string& name, glm::vec3 value)
+// set uniform matrix4f
+{
+    glUniform3fv(GetUniformLocation(name), 1, &value[0]);
+}
+
 void Shader::setMat4f(const std::string& name, glm::mat4 value)
 // set uniform matrix4f
 {

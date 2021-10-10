@@ -1367,6 +1367,8 @@
     <None Include="src\vendor\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="res\shaders\lighting.vs" />
+    <None Include="res\shaders\lighting.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\noHair.png">
