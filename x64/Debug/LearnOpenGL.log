@@ -1,0 +1,40 @@
+﻿  Application.cpp
+D:\OpenGLProject\LearnOpenGL\src\Application.cpp(69,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\OpenGLProject\LearnOpenGL\src\Application.cpp(70,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\OpenGLProject\LearnOpenGL\src\Application.cpp(74,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\OpenGLProject\LearnOpenGL\src\Application.cpp(75,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\OpenGLProject\LearnOpenGL\src\Application.cpp(76,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\OpenGLProject\LearnOpenGL\src\Application.cpp(77,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+D:\OpenGLProject\LearnOpenGL\src\Application.cpp(92,31): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+D:\OpenGLProject\LearnOpenGL\src\Application.cpp(296,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  Camera.cpp
+  Shader.cpp
+D:\OpenGLProject\LearnOpenGL\src\Shader.cpp(45,10): warning C4101: 'infoLog': unreferenced local variable
+D:\OpenGLProject\LearnOpenGL\src\Shader.cpp(44,9): warning C4101: 'success': unreferenced local variable
+  glm.cpp
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_glfw.cpp
+  imgui_impl_opengl3.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  stb_image.cpp
+  Generating Code...
+  glad.c
+glfw3.lib(context.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(context.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(init.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(init.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(input.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(input.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(monitor.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(monitor.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(vulkan.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(vulkan.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(window.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(window.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(win32_init.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(win32_init.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(win32_joystick.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(win32_joystick.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(win32_monitor.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(win32_monitor.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(win32_time.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(win32_time.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(win32_thread.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(win32_thread.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(win32_window.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(win32_window.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(wgl_context.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(wgl_context.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(egl_context.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(egl_context.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+glfw3.lib(osmesa_context.obj) : warning LNK4099: PDB 'glfw3.pdb' was not found with 'glfw3.lib(osmesa_context.obj)' or at 'D:\OpenGLProject\LearnOpenGL\x64\Debug\glfw3.pdb'; linking object as if no debug info
+  LearnOpenGL.vcxproj -> D:\OpenGLProject\LearnOpenGL\x64\Debug\LearnOpenGL.exe
