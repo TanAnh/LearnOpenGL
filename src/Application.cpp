@@ -295,7 +295,7 @@ int main()
         glm::vec3(1.5f,  0.2f, -1.5f),
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
-    glm::vec3 lightPos(-5.2f, 3.0f, -2.0f);
+    glm::vec3 lightPos(-4.2f, 3.0f, -2.0f);
 
     glm::mat4 model = glm::mat4(1.0f);  // model to world, make sure to initialize matrix to identity matrix first
     glm::mat4 view;                     // world to camera
@@ -330,7 +330,10 @@ int main()
         objectShader.setMat4f("projection", projection);
 
         objectShader.setVec3f("lightColor", glm::vec3(1.0f, 0.8f, 0.5f));
-        objectShader.setVec3f("lightPos", lightPos);
+        glm::vec3 lightRotateAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::mat4 lightRotate = glm::rotate(model, (float)glfwGetTime(), lightRotateAxis);
+        glm::vec4 lightRotate2 = glm::vec4(lightRotate * glm::vec4(lightPos, 1.0f));
+        objectShader.setVec3f("lightPos", glm::vec3(lightRotate2.x, lightRotate2.y, lightRotate2.z));
         objectShader.setVec3f("viewPos", camera.getPosition());
 
         glBindVertexArray(VAO);
@@ -350,7 +353,8 @@ int main()
         lightShader.use();
         lightShader.setMat4f("view", view);
         lightShader.setMat4f("projection", projection);
-        glm::mat4 model_light = glm::translate(model, lightPos);
+        glm::mat4 model_light = glm::rotate(model, (float)glfwGetTime(), lightRotateAxis);
+        model_light = glm::translate(model_light, lightPos);
         model_light = glm::scale(model_light, glm::vec3(0.5f));
         lightShader.setMat4f("model", model_light);
         
