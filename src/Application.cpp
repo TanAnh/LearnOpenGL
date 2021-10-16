@@ -26,8 +26,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // camera
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);  // initial camera position
 Camera camera(cameraPos);
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
+double lastX = SCR_WIDTH / 2.0f;
+double lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
@@ -71,8 +71,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
         firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    double xoffset = xpos - lastX;
+    double yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
     lastX = xpos;
     lastY = ypos;
 
@@ -141,19 +141,19 @@ int main()
     Shader lightShader("res/shaders/lighting.vs", "res/shaders/lighting.fs");
 
     // Create object to draw ------------------------------------------------------------------------------------------
-    
+    float sot = glm::sqrt(1.0f/3.0f); // square root of one third
     // set of vertices
     float vertices[] = {
-        // positions             // colors           // tex coords
-         0.5f,  0.5f, -0.5f,     1.0f, 1.0f, 1.0f,   1.0f, 1.0f,   // top right down
-         0.5f, -0.5f, -0.5f,     1.0f, 1.0f, 1.0f,   1.0f, 0.0f,   // bottom right down
-        -0.5f, -0.5f, -0.5f,     1.0f, 1.0f, 1.0f,   0.0f, 0.0f,   // bottom left down
-        -0.5f,  0.5f, -0.5f,     1.0f, 1.0f, 1.0f,   0.0f, 1.0f,   // top left down
+        // positions             // colors           // tex coords  // Normal vector
+         0.5f,  0.5f, -0.5f,     1.0f, 1.0f, 1.0f,   1.0f, 1.0f,    sot,   sot, -sot,   // top right down
+         0.5f, -0.5f, -0.5f,     1.0f, 1.0f, 1.0f,   1.0f, 0.0f,    sot,  -sot, -sot,   // bottom right down
+        -0.5f, -0.5f, -0.5f,     1.0f, 1.0f, 1.0f,   0.0f, 0.0f,   -sot,  -sot, -sot,   // bottom left down
+        -0.5f,  0.5f, -0.5f,     1.0f, 1.0f, 1.0f,   0.0f, 1.0f,   -sot,   sot, -sot,   // top left down
 
-         0.5f,  0.5f,  0.5f,     1.0f, 1.0f, 1.0f,   0.0f, 1.0f,   // top right up
-         0.5f, -0.5f,  0.5f,     1.0f, 1.0f, 1.0f,   0.0f, 0.0f,   // bottom right up
-        -0.5f, -0.5f,  0.5f,     1.0f, 1.0f, 1.0f,   1.0f, 0.0f,   // bottom left up
-        -0.5f,  0.5f,  0.5f,     1.0f, 1.0f, 1.0f,   1.0f, 1.0f    // top left up
+         0.5f,  0.5f,  0.5f,     1.0f, 1.0f, 1.0f,   0.0f, 1.0f,    sot,   sot,  sot,   // top right up
+         0.5f, -0.5f,  0.5f,     1.0f, 1.0f, 1.0f,   0.0f, 0.0f,    sot,  -sot,  sot,   // bottom right up
+        -0.5f, -0.5f,  0.5f,     1.0f, 1.0f, 1.0f,   1.0f, 0.0f,   -sot,  -sot,  sot,   // bottom left up
+        -0.5f,  0.5f,  0.5f,     1.0f, 1.0f, 1.0f,   1.0f, 1.0f,   -sot,   sot,  sot    // top left up
     };
 
     // set of indices
@@ -181,15 +181,19 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     // 4. then set the vertex attributes pointers:
+    unsigned int vertexDataSize = 11 * sizeof(float);
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexDataSize, (void*)0);
     glEnableVertexAttribArray(0);
     // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexDataSize, (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     // tex-coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, vertexDataSize, (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+    // nornal vec attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, vertexDataSize, (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
 
     // Light source --------------------------------------------------------------------------------------------------------
     
@@ -201,7 +205,7 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     // set the vertex attribute 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexDataSize, (void*)0);
     glEnableVertexAttribArray(0);
 
     // Texture --------------------------------------------------------------------------------------------------------
@@ -283,7 +287,7 @@ int main()
         glm::vec3(1.5f,  0.2f, -1.5f),
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
-    glm::vec3 lightPos(-5.2f, 6.0f, -5.0f);
+    glm::vec3 lightPos(-5.2f, 6.0f, -2.0f);
 
     glm::mat4 model = glm::mat4(1.0f);  // model to world, make sure to initialize matrix to identity matrix first
     glm::mat4 view;                     // world to camera
@@ -293,7 +297,7 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // per-frame time logic
-        float currentFrame = glfwGetTime();
+        double currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
@@ -301,7 +305,7 @@ int main()
 
         // Rendering ------------------------------------------
         // clear the colorbuffer
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.1f, 0.08f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         // Draw the Triangle    
@@ -318,10 +322,11 @@ int main()
         objectShader.setMat4f("projection", projection);
 
         objectShader.setVec3f("lightColor", glm::vec3(1.0f, 0.8f, 0.5f));
+        objectShader.setVec3f("lightPos", lightPos);
 
         glBindVertexArray(VAO);
         // create transformations
-        for (unsigned int i = 0; i < 10; i++)
+        for (unsigned int i = 0; i < sizeof(cubePositions)/sizeof(cubePositions[0]); i++)
         {   
             glm::mat4 model_object = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
