@@ -58,6 +58,14 @@ void processInput(GLFWwindow* window)
         camera.ProcessKeyboard(RIGHT, deltaTime); 
         std::cout << "D - Camera speed: " << camera.getMovementSpeed() << std::endl;
     }
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        camera.ProcessKeyboard(UP, deltaTime);
+        std::cout << "SPACE - Camera speed: " << camera.getMovementSpeed() << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        camera.ProcessKeyboard(DOWN, deltaTime);
+        std::cout << "CTRL - Camera speed: " << camera.getMovementSpeed() << std::endl;
+    }
 }
 
 // glfw: whenever the mouse moves, this callback is called
@@ -287,7 +295,7 @@ int main()
         glm::vec3(1.5f,  0.2f, -1.5f),
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
-    glm::vec3 lightPos(-5.2f, 6.0f, -2.0f);
+    glm::vec3 lightPos(-5.2f, 3.0f, -2.0f);
 
     glm::mat4 model = glm::mat4(1.0f);  // model to world, make sure to initialize matrix to identity matrix first
     glm::mat4 view;                     // world to camera
@@ -305,7 +313,7 @@ int main()
 
         // Rendering ------------------------------------------
         // clear the colorbuffer
-        glClearColor(0.1f, 0.08f, 0.05f, 1.0f);
+        glClearColor(0.05f, 0.04f, 0.025f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         // Draw the Triangle    
@@ -323,15 +331,17 @@ int main()
 
         objectShader.setVec3f("lightColor", glm::vec3(1.0f, 0.8f, 0.5f));
         objectShader.setVec3f("lightPos", lightPos);
+        objectShader.setVec3f("viewPos", camera.getPosition());
 
         glBindVertexArray(VAO);
         // create transformations
         for (unsigned int i = 0; i < sizeof(cubePositions)/sizeof(cubePositions[0]); i++)
         {   
             glm::mat4 model_object = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            model_object = glm::rotate(model_object, (float)glfwGetTime() * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            objectShader.setMat4f("model", model_object);
+            float rotateAngle = (float)glfwGetTime() * glm::radians(10.0f * i);
+            glm::vec3 rotateAxis = glm::vec3(1.0f, 0.3f, 0.5f * i);
+            glm::mat4 model_object2 = glm::rotate(model_object, rotateAngle, rotateAxis);
+            objectShader.setMat4f("model", model_object2);
             
             glDrawElements(GL_TRIANGLES, sizeof(indices)/ sizeof(indices[0]), GL_UNSIGNED_INT, 0);    // Draw all elements in indices
 
@@ -341,7 +351,7 @@ int main()
         lightShader.setMat4f("view", view);
         lightShader.setMat4f("projection", projection);
         glm::mat4 model_light = glm::translate(model, lightPos);
-        model_light = glm::scale(model_light, glm::vec3(1.5f));
+        model_light = glm::scale(model_light, glm::vec3(0.5f));
         lightShader.setMat4f("model", model_light);
         
         glBindVertexArray(lightVAO);
