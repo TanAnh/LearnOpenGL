@@ -333,8 +333,24 @@ int main()
         glm::vec3 lightRotateAxis = glm::vec3(0.0f, 1.0f, 0.0f);
         glm::mat4 lightRotate = glm::rotate(model, (float)glfwGetTime(), lightRotateAxis);
         glm::vec4 lightRotate2 = glm::vec4(lightRotate * glm::vec4(lightPos, 1.0f));
-        objectShader.setVec3f("lightPos", glm::vec3(lightRotate2.x, lightRotate2.y, lightRotate2.z));
+        
         objectShader.setVec3f("viewPos", camera.getPosition());
+        objectShader.setVec3f("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+        objectShader.setVec3f("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+        objectShader.setVec3f("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+        objectShader.setFloat("material.shininess", 32.0f);
+
+        glm::vec3 lightColor;
+        lightColor.x = sin(glfwGetTime() * 2.0f);
+        lightColor.y = sin(glfwGetTime() * 0.7f);
+        lightColor.z = sin(glfwGetTime() * 1.3f);
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.8f);
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+        
+        objectShader.setVec3f("light.position", glm::vec3(lightRotate2.x, lightRotate2.y, lightRotate2.z));
+        objectShader.setVec3f("light.ambient", ambientColor);
+        objectShader.setVec3f("light.diffuse", diffuseColor);
+        objectShader.setVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
         glBindVertexArray(VAO);
         // create transformations
@@ -357,6 +373,7 @@ int main()
         model_light = glm::translate(model_light, lightPos);
         model_light = glm::scale(model_light, glm::vec3(0.5f));
         lightShader.setMat4f("model", model_light);
+        lightShader.setVec3f("lightColor", lightColor);
         
         glBindVertexArray(lightVAO);
         
