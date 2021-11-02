@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string> 
 
 #include <glad/glad.h> // include glad before glfw
 #include <GLFW/glfw3.h>
@@ -281,18 +282,23 @@ int main()
 
     glm::vec3 cubePositions[] = {
         // different positions to render object at
-        glm::vec3(0.0f,  0.0f,  0.0f),
-        glm::vec3(2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f,  2.0f, -2.5f),
-        glm::vec3(1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
+        glm::vec3(0.0f, 0.0f,  0.0f),
+        glm::vec3(2.0f, 0.0f, 5.0f),
+        glm::vec3(-5.0f, 0.0f, -2.0f),
+        glm::vec3(-2.0f, 0.0f, -5.0f),
+        glm::vec3(5.0f, 0.0f, 2.0f)
     };
-    glm::vec3 lightPos(-4.2f, 3.0f, -2.0f);
+
+    const int numCubes = sizeof(cubePositions) / sizeof(cubePositions[0]);
+
+    glm::vec3 lightPos(-4.2f, -3.0f, -5.0f);
+    glm::vec3 pointLightPositions[] = {
+        glm::vec3(0.7f,  0.0f, -2.0f),
+        glm::vec3(2.0f, -2.3f, -3.0f),
+        glm::vec3(-4.0f, 2.0f, -4.0f)
+    };
+
+    const int numPointLight2 = sizeof(pointLightPositions) / sizeof(pointLightPositions[0]);
 
     glm::mat4 model = glm::mat4(1.0f);  // model to world, make sure to initialize matrix to identity matrix first
     glm::mat4 view;                     // world to camera
@@ -328,8 +334,6 @@ int main()
 
         float rotateRate = (float)glfwGetTime() / 2;
         glm::vec3 lightRotateAxis = glm::vec3(0.0f, 1.0f, 0.0f);
-        glm::mat4 lightRotate = glm::rotate(model, rotateRate, lightRotateAxis);
-        glm::vec4 lightRotate2 = glm::vec4(lightRotate * glm::vec4(lightPos, 1.0f));
         
         objectShader.setVec3f("viewPos", camera.getPosition());
         objectShader.setInt("material.ambient", 0);
@@ -338,34 +342,65 @@ int main()
         objectShader.setFloat("material.shininess", 32.0f);
 
         glm::vec3 lightColor;
-        lightColor.x = sin(glfwGetTime() * 0.2f) + 0.8f;
-        lightColor.y = sin(glfwGetTime() * 0.4f) + 0.6f;
+        lightColor.x = sin(glfwGetTime() * 0.2f) + 0.2f;
+        lightColor.y = sin(glfwGetTime() * 0.4f) + 0.2f;
         lightColor.z = sin(glfwGetTime() * 0.8f) + 0.2f;
         glm::vec3 diffuseColor = lightColor * glm::vec3(0.8f);
         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
-        
-        // objectShader.setVec3f("light.position", glm::vec3(lightRotate2.x, lightRotate2.y, lightRotate2.z));
-        // objectShader.setVec3f("light.direction", glm::vec3(-lightRotate2.x, -lightRotate2.y, -lightRotate2.z));
-        objectShader.setVec3f("light.position", camera.getPosition());
-        objectShader.setVec3f("light.direction", camera.getFront());
-        objectShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));   // inner cutoff for cone
-        objectShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));  // outerCutOff for cone
-        objectShader.setVec3f("light.ambient", ambientColor);
-        objectShader.setVec3f("light.diffuse", diffuseColor);
-        objectShader.setVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+        glm::mat4 pointLightRotate[numPointLight2];
+        glm::vec4 pointLightRotate2[numPointLight2];
+        // Point lights
+        for (int i = 0; i < numPointLight2; i++) {
+            std::string pointLight = "pointLights[" + std::to_string(i) + "]";
+            std::string pointLightPosition = pointLight + ".position";
+            std::string pointLightAmbient = pointLight + ".ambient";
+            std::string pointLightDiffuse = pointLight + ".diffuse";
+            std::string pointLightSpecular = pointLight + ".specular";
+            std::string pointLightConstant = pointLight + ".constant";
+            std::string pointLightLinear = pointLight + ".linear";
+            std::string pointLightQuadratic = pointLight + ".quadratic";
+
+            pointLightRotate[i] = glm::rotate(model, rotateRate * glm::radians(30.0f * i), lightRotateAxis);
+            pointLightRotate2[i] = glm::vec4(pointLightRotate[i] * glm::vec4(pointLightPositions[i], 1.0f));
+            // model_light[i] = glm::scale(model_light[i], glm::vec3(0.5f));
+            objectShader.setVec3f(pointLightPosition, glm::vec3(pointLightRotate2[i].x, pointLightRotate2[i].y, pointLightRotate2[i].z));
+            objectShader.setVec3f(pointLightAmbient, ambientColor);
+            objectShader.setVec3f(pointLightDiffuse, diffuseColor);
+            objectShader.setVec3f(pointLightSpecular, glm::vec3(1.0f, 1.0f, 1.0f));
+            // https://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation
+            objectShader.setFloat(pointLightConstant, 1.0f);
+            objectShader.setFloat(pointLightLinear, 0.09f);
+            objectShader.setFloat(pointLightQuadratic, 0.032f);
+        }
+
+        // directional light
+        glm::vec3 dirLightColor = glm::vec3(0.5f, 0.5f, 0.4f);
+        objectShader.setVec3f("dirLight.direction", lightPos);
+        objectShader.setVec3f("dirLight.ambient", dirLightColor * glm::vec3(0.2f));
+        objectShader.setVec3f("dirLight.diffuse", dirLightColor);
+        objectShader.setVec3f("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+        // spot light
+        glm::vec3 spotLightColor = glm::vec3(0.2f);
+        objectShader.setVec3f("spotLight.position", camera.getPosition());
+        objectShader.setVec3f("spotLight.direction", camera.getFront());
+        objectShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));   // inner cutoff for cone
+        objectShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));  // outerCutOff for cone
+        objectShader.setVec3f("spotLight.ambient", spotLightColor * glm::vec3(0.2f));
+        objectShader.setVec3f("spotLight.diffuse", spotLightColor);
+        objectShader.setVec3f("spotLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
         // https://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation
-        objectShader.setFloat("light.constant", 1.0f);
-        objectShader.setFloat("light.linear", 0.09f);
-        objectShader.setFloat("light.quadratic", 0.032f);
+        objectShader.setFloat("spotLight.constant", 1.0f);
+        objectShader.setFloat("spotLight.linear", 0.09f);
+        objectShader.setFloat("spotLight.quadratic", 0.032f);
 
         glBindVertexArray(VAO);
         // create transformations
-        for (unsigned int i = 0; i < sizeof(cubePositions)/sizeof(cubePositions[0]); i++)
+        for (unsigned int i = 0; i < numCubes; i++)
         {   
             glm::mat4 model_object = glm::translate(model, cubePositions[i]);
-            float rotateAngle = rotateRate * glm::radians(10.0f * i);
-            glm::vec3 rotateAxis = glm::vec3(1.0f, 0.3f, 0.5f * i);
-            glm::mat4 model_object2 = glm::rotate(model_object, rotateAngle, rotateAxis);
+            glm::mat4 model_object2 = glm::rotate(model_object, rotateRate * glm::radians(20.0f * i), glm::vec3(0.0f, 1.0f, 0.0f));
             objectShader.setMat4f("model", model_object2);
             
             glDrawElements(GL_TRIANGLES, sizeof(indices)/ sizeof(indices[0]), GL_UNSIGNED_INT, 0);    // Draw all elements in indices
@@ -373,18 +408,23 @@ int main()
         }
         
         lightShader.use();
-        lightShader.setMat4f("view", view);
-        lightShader.setMat4f("projection", projection);
-        glm::mat4 model_light = glm::rotate(model, rotateRate, lightRotateAxis);
-        model_light = glm::translate(model_light, lightPos);
-        model_light = glm::scale(model_light, glm::vec3(0.5f));
-        lightShader.setMat4f("model", model_light);
-        lightShader.setVec3f("lightColor", lightColor);
-        
+
         glBindVertexArray(lightVAO);
         
-        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0);    // Draw all elements in indices
+        lightShader.setVec3f("lightColor", lightColor);
+        lightShader.setMat4f("view", view);
+        lightShader.setMat4f("projection", projection);
 
+        for (unsigned int i = 0; i < numPointLight2; i++)
+        {
+            glm::mat4 model_light = glm::rotate(model, rotateRate * glm::radians(30.0f * i), lightRotateAxis);
+            lightShader.setMat4f("model", model_light);
+            glm::mat4 model_light2 = glm::translate(model_light, pointLightPositions[i]); // pointLightPositions[i]
+            model_light2 = glm::scale(model_light2, glm::vec3(0.5f));
+            lightShader.setMat4f("model", model_light2);
+            glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0);    // Draw all elements in indices
+        }
+        
         // glBindVertexArray(0); // no need to unbind it every time 
 
         // check and call events and swap the buffers ------------
