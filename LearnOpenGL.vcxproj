@@ -617,6 +617,8 @@
     <None Include="src\vendor\glm\gtx\wrap.inl" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\textures\container2.png" />
+    <Image Include="res\textures\container2_specular.png" />
     <Image Include="res\textures\noHair.png" />
     <Image Include="res\textures\pop_cat.png" />
   </ItemGroup>

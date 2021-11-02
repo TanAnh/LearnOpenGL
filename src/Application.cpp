@@ -229,7 +229,7 @@ int main()
     // load image for texture 1
     int texWidth, texHeight, texChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    unsigned char* texData = stbi_load("res/textures/noHair.png", &texWidth, &texHeight, &texChannels, 0);
+    unsigned char* texData = stbi_load("res/textures/container2.png", &texWidth, &texHeight, &texChannels, 0);
     if (texData) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData); // generate texture
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -250,7 +250,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load image for texture 2
     // stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    texData = stbi_load("res/textures/pop_cat.png", &texWidth, &texHeight, &texChannels, 0);
+    texData = stbi_load("res/textures/container2_specular.png", &texWidth, &texHeight, &texChannels, 0);
     if (texData) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData); // generate texture
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -263,9 +263,6 @@ int main()
 
     // -------------------------------------------------------------------------------------------
     objectShader.use(); // don't forget to activate/use the shader before setting uniforms!
-
-    objectShader.setInt("texture1", 0);
-    objectShader.setInt("texture2", 1);
 
     // This is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object
     // so afterwards we can safely unbind
@@ -329,35 +326,44 @@ int main()
         projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         objectShader.setMat4f("projection", projection);
 
-        objectShader.setVec3f("lightColor", glm::vec3(1.0f, 0.8f, 0.5f));
+        float rotateRate = (float)glfwGetTime() / 2;
         glm::vec3 lightRotateAxis = glm::vec3(0.0f, 1.0f, 0.0f);
-        glm::mat4 lightRotate = glm::rotate(model, (float)glfwGetTime(), lightRotateAxis);
+        glm::mat4 lightRotate = glm::rotate(model, rotateRate, lightRotateAxis);
         glm::vec4 lightRotate2 = glm::vec4(lightRotate * glm::vec4(lightPos, 1.0f));
         
         objectShader.setVec3f("viewPos", camera.getPosition());
-        objectShader.setVec3f("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-        objectShader.setVec3f("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
-        objectShader.setVec3f("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+        objectShader.setInt("material.ambient", 0);
+        objectShader.setInt("material.diffuse", 0);
+        objectShader.setInt("material.specular", 1);
         objectShader.setFloat("material.shininess", 32.0f);
 
         glm::vec3 lightColor;
-        lightColor.x = sin(glfwGetTime() * 2.0f);
-        lightColor.y = sin(glfwGetTime() * 0.7f);
-        lightColor.z = sin(glfwGetTime() * 1.3f);
+        lightColor.x = sin(glfwGetTime() * 0.2f) + 0.8f;
+        lightColor.y = sin(glfwGetTime() * 0.4f) + 0.6f;
+        lightColor.z = sin(glfwGetTime() * 0.8f) + 0.2f;
         glm::vec3 diffuseColor = lightColor * glm::vec3(0.8f);
         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
         
-        objectShader.setVec3f("light.position", glm::vec3(lightRotate2.x, lightRotate2.y, lightRotate2.z));
+        // objectShader.setVec3f("light.position", glm::vec3(lightRotate2.x, lightRotate2.y, lightRotate2.z));
+        // objectShader.setVec3f("light.direction", glm::vec3(-lightRotate2.x, -lightRotate2.y, -lightRotate2.z));
+        objectShader.setVec3f("light.position", camera.getPosition());
+        objectShader.setVec3f("light.direction", camera.getFront());
+        objectShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));   // inner cutoff for cone
+        objectShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));  // outerCutOff for cone
         objectShader.setVec3f("light.ambient", ambientColor);
         objectShader.setVec3f("light.diffuse", diffuseColor);
         objectShader.setVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        // https://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation
+        objectShader.setFloat("light.constant", 1.0f);
+        objectShader.setFloat("light.linear", 0.09f);
+        objectShader.setFloat("light.quadratic", 0.032f);
 
         glBindVertexArray(VAO);
         // create transformations
         for (unsigned int i = 0; i < sizeof(cubePositions)/sizeof(cubePositions[0]); i++)
         {   
             glm::mat4 model_object = glm::translate(model, cubePositions[i]);
-            float rotateAngle = (float)glfwGetTime() * glm::radians(10.0f * i);
+            float rotateAngle = rotateRate * glm::radians(10.0f * i);
             glm::vec3 rotateAxis = glm::vec3(1.0f, 0.3f, 0.5f * i);
             glm::mat4 model_object2 = glm::rotate(model_object, rotateAngle, rotateAxis);
             objectShader.setMat4f("model", model_object2);
@@ -369,7 +375,7 @@ int main()
         lightShader.use();
         lightShader.setMat4f("view", view);
         lightShader.setMat4f("projection", projection);
-        glm::mat4 model_light = glm::rotate(model, (float)glfwGetTime(), lightRotateAxis);
+        glm::mat4 model_light = glm::rotate(model, rotateRate, lightRotateAxis);
         model_light = glm::translate(model_light, lightPos);
         model_light = glm::scale(model_light, glm::vec3(0.5f));
         lightShader.setMat4f("model", model_light);
